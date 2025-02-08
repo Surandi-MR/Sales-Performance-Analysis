@@ -11,5 +11,78 @@ df <- read.csv("C:\\Users\\RISINA\\Desktop\\Assestment\\Retail_Apparel_Data_06.0
 head(df)
 
 df$Date.Time <- dmy_hm(df$Date.Time)  # Convert "Date Time" column to datetime format
+
+# Check missing values
+colSums(is.na(df))
+
+# Fill missing Customer Age Group with "Unknown"
+df$Customer.Age.Group[is.na(df$Customer.Age.Group)] <- "Unknown"
+
+df <- df %>% distinct()  # Remove duplicate rows
+
+##Identify and Handle Outliers
+
+# Summary of Quantity
+summary(df$Quantity)
+
+# Create a Boxplot for Quantity
+ggplot(df, aes(y = Quantity)) +
+  geom_boxplot(outlier.colour = "red", outlier.shape = 16, outlier.size = 3) +
+  labs(title = "Boxplot of Quantity", y = "Quantity") +
+  theme_minimal()
+
+#Identify Outliers values and remove
+Q1 <- quantile(df$Quantity, 0.25)  # First Quartile (25%)
+Q3 <- quantile(df$Quantity, 0.75)  # Third Quartile (75%)
+IQR <- Q3 - Q1  # Interquartile Range
+
+# Define outlier boundaries
+lower_bound <- Q1 - 1.5 * IQR
+upper_bound <- Q3 + 1.5 * IQR
+
+df <- df %>% filter(Quantity >= lower_bound & Quantity <= upper_bound)
+
+ggplot(df, aes(y = Quantity)) +
+  geom_boxplot(outlier.colour = "red", outlier.shape = 16, outlier.size = 3) +
+  labs(title = "Boxplot of Quantity", y = "Quantity") +theme_minimal()
+
+```
+
+
+```{r}
+product_penetration <- df %>%
+  group_by(Product.ID) %>%
+  summarise(Unique.Invoices = n_distinct(Invoice.Number)) %>%
+  mutate(Product.Penetration = (Unique.Invoices / n_distinct(df$Invoice.Number)) * 100)
+
+head(product_penetration)
+
+product_penetration
+
+# Sort products by penetration (Highest to Lowest)
+product_penetration %>% arrange(desc(Product.Penetration)) %>% head()
+
+# Sort products by penetration (Lowest to Highest)
+product_penetration %>% arrange(Product.Penetration) %>% head()
+
+ggplot(product_penetration, aes(x = reorder(Product.ID, -Product.Penetration), y = Product.Penetration)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = "Product Penetration by Product", x = "Product ID", y = "Penetration (%)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Select Top 10 and Bottom 10 Products
+top_10 <- product_penetration %>% arrange(desc(Product.Penetration)) %>% head(10)
+bottom_10 <- product_penetration %>% arrange(Product.Penetration) %>% head(10)
+
+# Combine Top and Bottom Data
+top_bottom <- bind_rows(top_10, bottom_10)
+
+# Bar Plot for Top & Bottom 10 Products
+ggplot(top_bottom, aes(x = reorder(Product.ID, -Product.Penetration), y = Product.Penetration)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(title = "Top 10 and Bottom 10 Product Penetration", x = "Product ID", y = "Penetration (%)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+##Most popular product is 49 and least popular product is 50
 ```
 
