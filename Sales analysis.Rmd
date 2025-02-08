@@ -88,4 +88,33 @@ ggplot(top_bottom, aes(x = reorder(Product.ID, -Product.Penetration), y = Produc
 
 ```
 
+```{r}
+# Calculate Average Invoice Value
+avg_invoice_value <- df %>%
+  group_by(Invoice.Number) %>%
+  summarise(Total.Invoice.Value = sum(Total.Sales)) %>%
+  summarise(Average.Invoice.Value = mean(Total.Invoice.Value))
+print(avg_invoice_value)
+##Average.Invoice.Value = 241.1513	 
+
+
+
+# Calculate Average Invoice Value by Customer Age Group
+avg_invoice_by_age <- df %>%
+  group_by(Customer.Age.Group, Invoice.Number) %>%
+  summarise(Total.Invoice.Value = sum(Total.Sales), .groups = "drop") %>%
+  group_by(Customer.Age.Group) %>%
+  summarise(Average.Invoice.Value = mean(Total.Invoice.Value))
+print(avg_invoice_by_age) 
+
+
+
+# Calculate Average Invoice Value by Sales Channel
+avg_invoice_by_channel <- df %>%
+  group_by(Sales.Channel, Invoice.Number) %>%
+  summarise(Total.Invoice.Value = sum(Total.Sales), .groups = "drop") %>%
+  group_by(Sales.Channel) %>%
+  summarise(Average.Invoice.Value = mean(Total.Invoice.Value))
+print(avg_invoice_by_channel)
+```
 
