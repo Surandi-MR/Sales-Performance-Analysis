@@ -1,0 +1,13 @@
+---
+title: "Sales Performance Analysis"
+author: "Risina Surandi"
+date: "2025-02-08"
+output: html_document
+---
+```{r}
+library(tidyverse)
+
+df <- read.csv("C:\\Users\\RISINA\\Desktop\\Assestment\\Retail_Apparel_Data_06.02.25_v1.csv", stringsAsFactors = FALSE)
+head(df)
+```
+
