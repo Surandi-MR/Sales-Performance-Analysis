@@ -163,3 +163,48 @@ ggplot(return_by_region, aes(x = reorder(Region, -Return.Rate), y = Return.Rate,
 
 ```
 
+```{r}
+# Convert Date column to Date format
+df$Date <- as.Date(df$Date.Time, format="%d/%m/%Y")
+
+# Aggregate sales by Region and Date
+sales_by_region <- aggregate(df$Total.Sales, by=list(df$Region, df$Date), sum)
+
+# Rename columns
+colnames(sales_by_region) <- c("Region", "Date", "Total.Sales")
+
+# Calculate sales growth (example: day-to-day growth)
+sales_by_region <- sales_by_region[order(sales_by_region$Region, sales_by_region$Date), ]
+
+sales_by_region$Sales.Growth <- ave(
+  sales_by_region$Total.Sales, 
+  sales_by_region$Region, 
+  FUN = function(x) c(NA, diff(x) / head(x, -1) * 100)
+)
+
+# View results
+print(sales_by_region)
+
+
+
+
+
+# Convert Date column to Date format (Modify format if necessary)
+df$Date <- as.Date(df$Date.Time, format="%d/%m/%Y")
+
+# Aggregate total sales by Region and Date
+sales_by_region <- df %>%
+  group_by(Region, Date) %>%
+  summarise(Total_Sales = sum(Total.Sales, na.rm = TRUE)) %>%
+  arrange(Region, Date)
+
+# Calculate Sales Growth (Day-to-Day Percentage Change)
+sales_by_region <- sales_by_region %>%
+  group_by(Region) %>%
+  mutate(Sales_Growth = (Total_Sales - lag(Total_Sales)) / lag(Total_Sales) * 100)
+
+# View results
+print(sales_by_region)
+
+```
+
