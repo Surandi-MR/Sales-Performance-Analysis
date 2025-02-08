@@ -84,5 +84,8 @@ ggplot(top_bottom, aes(x = reorder(Product.ID, -Product.Penetration), y = Produc
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ##Most popular product is 49 and least popular product is 50
+
+
 ```
+
 
