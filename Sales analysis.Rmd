@@ -118,3 +118,48 @@ avg_invoice_by_channel <- df %>%
 print(avg_invoice_by_channel)
 ```
 
+```{r}
+return_rate <- df %>%
+  group_by(Return.Status) %>%
+  summarise(Count = n()) %>%
+  mutate(Return.Percentage = (Count / sum(Count)) * 100)
+print(return_rate)
+
+
+
+# Calculate Return Rate by Product Category
+return_by_category <- df %>%
+  group_by(Product.Category) %>%
+  summarise(Total.Sold = n(), Returned = sum(Return.Status == "Returned"), .groups = "drop") %>%
+  mutate(Return.Rate = (Returned / Total.Sold) * 100)
+
+# Print Results
+print(return_by_category)
+
+# Plot Return Rate by Product Category
+ggplot(return_by_category, aes(x = reorder(Product.Category, -Return.Rate), y = Return.Rate, fill = Product.Category)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Return Rate by Product Category", x = "Product Category", y = "Return Rate (%)") +
+  theme_minimal() +
+  coord_flip() # Rotate for better readability
+
+
+# Calculate Return Rate by Region
+return_by_region <- df %>%
+  group_by(Region) %>%
+  summarise(Total.Sold = n(), Returned = sum(Return.Status == "Returned"), .groups = "drop") %>%
+  mutate(Return.Rate = (Returned / Total.Sold) * 100)
+
+# Print Results
+print(return_by_region)
+
+# Plot Return Rate by Region
+ggplot(return_by_region, aes(x = reorder(Region, -Return.Rate), y = Return.Rate, fill = Region)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Return Rate by Region", x = "Region", y = "Return Rate (%)") +
+  theme_minimal() +
+  coord_flip()
+
+
+```
+
